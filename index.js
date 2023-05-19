@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const app=express();
-const port=process.env.PORT || 5000;
+const app = express();
+const port = process.env.PORT || 5000;
 
 
 app.use(cors())
@@ -27,26 +27,35 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const toysCollection= client.db('toysDB').collection('toys');
+    const toysCollection = client.db('toysDB').collection('toys');
 
 
-    app.get('/toys', async(req,res)=>{
+    app.get('/toys', async (req, res) => {
       console.log(req.query.email)
-      let query={};
-      if(req.query?.email){
-        query ={ email: req.query.email}
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
       }
-        const result= await toysCollection.find(query).toArray();
-        res.send(result)
+      const result = await toysCollection.find(query).toArray();
+      res.send(result)
     })
 
-    
+    app.get('/toys/:text', async (req, res) => {
+      console.log(req.params.text)
+      if (req.params.text == 'RegularCar' || req.params.text == 'PuliceCar' || req.params.text == 'Truck') {
+        const result = await toysCollection.find({ category:req.params.text }).toArray()
+        console.log(result)
+        return res.send(result)
+      }
+    })
 
-    app.post('/toys', async(req,res)=>{
-        const newToys=req.body;
-        console.log(newToys)
-        const result =await toysCollection.insertOne(newToys)
-        res.send(result)
+
+
+    app.post('/toys', async (req, res) => {
+      const newToys = req.body;
+      console.log(newToys)
+      const result = await toysCollection.insertOne(newToys)
+      res.send(result)
     })
 
 
@@ -63,10 +72,10 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/',(req,res)=>{
-    res.send('baby is crying')
+app.get('/', (req, res) => {
+  res.send('baby is crying')
 })
 
-app.listen(port,()=>{
-    console.log(`baby crying on port ${port}`)
+app.listen(port, () => {
+  console.log(`baby crying on port ${port}`)
 })
