@@ -29,9 +29,9 @@ async function run() {
 
     const toysCollection = client.db('toysDB').collection('toys');
 
-    const indexKeys = { title: 1, category: 1 }; 
-    const indexOptions = { name: "titleCategory" }; 
-    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    // const indexKeys = { title: 1, category: 1 }; 
+    // const indexOptions = { name: "titleCategory" }; 
+    // const result = await toysCollection.createIndex(indexKeys, indexOptions);
 
 
     app.get('/toys', async (req, res) => {
@@ -44,6 +44,15 @@ async function run() {
       res.send(result)
     })
 
+
+
+    app.get('/toys/:id', async(req,res)=>{
+      const id=req.params.id;
+      const query={_id: new ObjectId(id)};
+      const result=await toysCollection.findOne(query)
+      res.send(result)
+    })
+
     app.get('/toys/:text', async (req, res) => {
       console.log(req.params.text)
          if (req.params.text == 'RegularCar' || req.params.text == 'PuliceCar' || req.params.text == 'Truck') {
@@ -53,9 +62,11 @@ async function run() {
       }
     })
 
-    app.get('/getToyByToyname/:text', async(req,res)=>{
+   
 
-    })
+    // app.get('/getToyByToyname/:text', async(req,res)=>{
+
+    // })
 
 
 
