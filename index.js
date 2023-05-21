@@ -25,25 +25,27 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const toysCollection = client.db('toysDB').collection('toys');
 
     // search by toy name
 
-    const indexKeys = { toyName: 1}; 
-    const indexOptions = { name: "toyName" }; 
-    const result = await toysCollection.createIndex(indexKeys, indexOptions);
-    console.log(result)
+    // const indexKeys = { toyName: 1 };
+    // const indexOptions = { name: "toyName" };
+    // const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    // console.log(result)
 
-    
-    app.get('/getToysByText/:text', async(req,res)=>{
-      const text =req.params.text;
-      const result=await toysCollection.find({toyName:{$regex: text,$options: 'i'}}).toArray();
+
+    app.get('/getToysByText/:text', async (req, res) => {
+      const text = req.params.text;
+      const result = await toysCollection.find({ toyName: { $regex: text, $options: 'i' } }).toArray();
       res.send(result)
     })
 
-// my toys data
+
+
+    // my toys data
 
     app.get('/toys', async (req, res) => {
       console.log(req.query.email)
@@ -51,11 +53,14 @@ async function run() {
       if (req.query?.email) {
         query = { email: req.query.email }
       }
-      const result = await toysCollection.find(query).limit(20).toArray();
+      const result = await toysCollection.find(query).limit(20).sort().toArray();
       res.send(result)
     })
 
-// specific data
+    
+
+
+    // specific data
 
     app.get('/toysById/:id', async (req, res) => {
       const id = req.params.id;
@@ -63,6 +68,8 @@ async function run() {
       const result = await toysCollection.findOne(query)
       res.send(result)
     })
+
+
 
     // category data
 
@@ -75,7 +82,18 @@ async function run() {
       }
     })
 
-// post
+
+    app.get('/sortByPrice', async(req,res)=>{
+      const user = req.query.user;
+      const sort= parseInt(req.query.sort);
+
+      const result= await toysCollection.find().sort({price: sort}).toArray()
+      res.send(result);
+    })
+
+
+
+    // post
 
     app.post('/toys', async (req, res) => {
       const newToys = req.body;
@@ -84,13 +102,15 @@ async function run() {
       res.send(result)
     })
 
-// update 
+
+
+    // update 
 
     app.put('/toys/:id', async (req, res) => {
       const id = req.params.id;
       console.log(id)
       const filter = { _id: new ObjectId(id) };
-     const options={upsert: true}
+      const options = { upsert: true }
       const updatedToy = req.body;
       const newToys = {
         $set: {
@@ -105,7 +125,7 @@ async function run() {
           category: updatedToy.category
         }
       };
-      const result = await toysCollection.updateOne(filter, newToys,options)
+      const result = await toysCollection.updateOne(filter, newToys, options)
       res.send(result)
     })
 
@@ -121,7 +141,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
