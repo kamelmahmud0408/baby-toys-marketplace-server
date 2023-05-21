@@ -31,11 +31,6 @@ async function run() {
 
     // search by toy name
 
-    // const indexKeys = { toyName: 1 };
-    // const indexOptions = { name: "toyName" };
-    // const result = await toysCollection.createIndex(indexKeys, indexOptions);
-    // console.log(result)
-
 
     app.get('/getToysByText/:text', async (req, res) => {
       const text = req.params.text;
@@ -82,12 +77,13 @@ async function run() {
       }
     })
 
+    // sorting
 
     app.get('/sortByPrice', async(req,res)=>{
       const user = req.query.user;
       const sort= parseInt(req.query.sort);
 
-      const result= await toysCollection.find().sort({price: sort}).toArray()
+      const result= await toysCollection.find({email:user}).sort({price: sort}).toArray()
       res.send(result);
     })
 
@@ -156,5 +152,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`baby crying on port ${port}`)
+  console.log(`server on running on port ${port}`)
 })
